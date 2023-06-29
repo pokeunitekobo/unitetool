@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>MOBA 配置ツール</title>
+  <style>
+    /* CSS スタイル */
+
+    /* 全体のスタイル */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0; /* body の余白をリセット */
+    }
+
+    /* ヘッダー */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background-color: #333;
+      color: #fff;
+      padding: 10px;
+      text-align: center;
+      z-index: 9999; /* タイトルを最前面に表示 */
+    }
+
+    /* メインコンテンツ */
+    main {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: calc(100vh - 50px); /* ウィンドウの高さからヘッダーの高さを引く */
+      margin-top: 50px; /* タイトルとの間隔を設定 */
+      overflow: hidden; /* マップのオーバーフローを制御 */
+    }
+
+    /* マップコンテナ */
+    .map-container {
+      position: relative;
+      width: 1600px;
+      height: 776px;
+      margin-bottom: 20px; /* キャラクターボックスとの間隔を調整 */
+      overflow: auto; /* マップのスクロールを有効にする */
+    }
+
+    /* マップ */
+    .map {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url('map.png');
+      background-size: cover;
+      z-index: -1; /* キャラクターボックスよりも奥に表示 */
+    }
+
+    /* キャラクターボックス */
+    .character-box {
+      position: absolute;
+      /* 他のスタイル */
+      cursor: move; /* ドラッグ可能なカーソルを設定 */
+    }
+
+    /* 配置エリア */
+    .placement-area {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* プレイヤーアイコン */
+    .player-icon {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      background-color: #f00;
+      border-radius: 50%;
+      background-size: cover;
+      pointer-events: none; /* ドラッグ時のイベントを無効化 */
+    }
+
+    /* マップ外の整列エリア */
+    .outside-area {
+      display: flex;
+      flex-wrap: wrap;
+      padding: 20px;
+      box-sizing: border-box;
+      z-index: 1; /* マップより手前に表示 */
+    }
+
+    /* マップ外のキャラクターアイコン */
+   .outside-character {
+      position: relative;
+      width: 40px;
+      height: 40px;
+      background-color: #00f;
+      border-radius: 50%;
+      margin: 5px;
+      cursor: pointer; /* ドラッグ可能なカーソルを設定 */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* マップ外のキャラクターアイコン画像 */
+    .outside-character img {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>MOBA 配置ツール</h1>
+  </header>
+
+  <main>
+    <div class="map-container">
+      <div class="map"></div>
+      <div class="placement-area"></div>
+    </div>
+
+    <div class="outside-area">
+      <div class="outside-character" draggable="true" ondragstart="drag(event)" data-character="r">
+        <img src="r.png" alt="ルカリオ">
+      </div>
+      <div class="outside-character" draggable="true" ondragstart="drag(event)" data-character="k">
+        <img src="k.png" alt="カビゴン">
+      </div>
+      <div class="outside-character" draggable="true" ondragstart="drag(event)" data-character="u">
+        <img src="u.png" alt="ウッウ">
+      </div>
+      <!-- 他のマップ外のキャラクターアイコンも追加 -->
+    </div>
+  </main>
+
+  <script>
+    function drag(event) {
+      event.dataTransfer.setData('text/plain', event.target.id);
+      var dragImage = document.createElement('img');
+      dragImage.src = event.target.getAttribute('src');
+      event.dataTransfer.setDragImage(dragImage, 15, 15);
+    }
+
+    function allowDrop(event) {
+      event.preventDefault();
+    }
+
+    function drop(event) {
+      event.preventDefault();
+      var characterId = event.dataTransfer.getData('text/plain');
+      var character = document.getElementById(characterId);
+      var playerIcon = document.createElement('div');
+      playerIcon.classList.add('player-icon');
+      var offsetX = event.clientX - placementArea.getBoundingClientRect().left;
+      var offsetY = event.clientY - placementArea.getBoundingClientRect().top;
+      playerIcon.style.top = offsetY - playerIcon.offsetHeight / 2 + 'px';
+      playerIcon.style.left = offsetX - playerIcon.offsetWidth / 2 + 'px';
+      var characterType = character.getAttribute('data-character');
+      playerIcon.style.backgroundImage = "url('" + characterType + ".png')";
+      placementArea.appendChild(playerIcon);
+    }
+
+    var placementArea = document.querySelector('.placement-area');
+    placementArea.addEventListener('dragover', allowDrop);
+    placementArea.addEventListener('drop', drop);
+  </script>
+</body>
+</html>
